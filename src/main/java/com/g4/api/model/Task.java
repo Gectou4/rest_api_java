@@ -1,6 +1,10 @@
 package com.g4.api.model;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;
@@ -35,7 +39,10 @@ public class Task extends ModelAbstract {
             return;
         }
         setId(id);
-        String sql = "SELECT status, title, description, creation_date FROM " + table + " WHERE task_id = ?";
+        String sql =
+                "SELECT status, title, description, creation_date FROM "
+                        + table
+                        + " WHERE task_id = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setInt(1, getId());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -93,8 +100,12 @@ public class Task extends ModelAbstract {
     public boolean save() {
         try {
             if (getId() <= 0) {
-                String sql = "INSERT INTO " + table + " (status, title, description, creation_date) VALUES (?, ?, ?, ?)";
-                try (PreparedStatement stmt = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                String sql =
+                        "INSERT INTO "
+                                + table
+                                + " (status, title, description, creation_date) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement stmt =
+                        getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setInt(1, getStatus().getValue());
                     stmt.setString(2, getTitle());
                     stmt.setString(3, getDescription());
@@ -107,7 +118,10 @@ public class Task extends ModelAbstract {
                     }
                 }
             } else {
-                String sql = "UPDATE " + table + " SET status=?, title=?, description=?, creation_date=? WHERE task_id = ?";
+                String sql =
+                        "UPDATE "
+                                + table
+                                + " SET status=?, title=?, description=?, creation_date=? WHERE task_id = ?";
                 try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
                     stmt.setInt(1, getStatus().getValue());
                     stmt.setString(2, getTitle());
@@ -139,7 +153,7 @@ public class Task extends ModelAbstract {
         Map<Integer, Map<String, Object>> taskList = new LinkedHashMap<>();
         String sql = "SELECT task_id, status, title, description, creation_date FROM " + table;
         try (PreparedStatement stmt = getConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 int taskId = rs.getInt("task_id");
                 TaskStatus taskStatus = TaskStatus.fromValue(rs.getInt("status"));
@@ -148,7 +162,9 @@ public class Task extends ModelAbstract {
                 task.put("status", taskStatus.getValue());
                 task.put("title", rs.getString("title"));
                 task.put("description", rs.getString("description"));
-                task.put("creation_date", rs.getTimestamp("creation_date").toLocalDateTime().toString());
+                task.put(
+                        "creation_date",
+                        rs.getTimestamp("creation_date").toLocalDateTime().toString());
                 taskList.put(taskId, task);
             }
         } catch (SQLException e) {
@@ -159,11 +175,15 @@ public class Task extends ModelAbstract {
 
     public Map<String, Object> toArray() {
         return Map.of(
-                "task_id", getId(),
-                "status", getStatus().getValue(),
-                "title", getTitle(),
-                "description", getDescription(),
-                "creation_date", getCreationDate().toString()
-        );
+                "task_id",
+                getId(),
+                "status",
+                getStatus().getValue(),
+                "title",
+                getTitle(),
+                "description",
+                getDescription(),
+                "creation_date",
+                getCreationDate().toString());
     }
 }

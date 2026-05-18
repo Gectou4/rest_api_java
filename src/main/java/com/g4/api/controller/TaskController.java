@@ -8,8 +8,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.Map;
-
 @Path("/task")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -22,9 +20,10 @@ public class TaskController {
     }
 
     @POST
-    public Response createTask(@FormParam("title") String title,
-                               @FormParam("description") String description,
-                               @FormParam("status") Integer status) {
+    public Response createTask(
+            @FormParam("title") String title,
+            @FormParam("description") String description,
+            @FormParam("status") Integer status) {
         if (title == null || title.isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Title is required")
@@ -49,19 +48,21 @@ public class TaskController {
 
     @POST
     @Path("/{id}")
-    public Response editTaskPost(@PathParam("id") int id,
-                                 @FormParam("title") String title,
-                                 @FormParam("description") String description,
-                                 @FormParam("status") Integer status) {
+    public Response editTaskPost(
+            @PathParam("id") int id,
+            @FormParam("title") String title,
+            @FormParam("description") String description,
+            @FormParam("status") Integer status) {
         return editTask(id, title, description, status);
     }
 
     @PUT
     @Path("/{id}")
-    public Response editTaskPut(@PathParam("id") int id,
-                                @FormParam("title") String title,
-                                @FormParam("description") String description,
-                                @FormParam("status") Integer status) {
+    public Response editTaskPut(
+            @PathParam("id") int id,
+            @FormParam("title") String title,
+            @FormParam("description") String description,
+            @FormParam("status") Integer status) {
         return editTask(id, title, description, status);
     }
 
@@ -109,15 +110,15 @@ public class TaskController {
 
     @POST
     @Path("/user/{userId}/task/{taskId}")
-    public Response addTaskToUserPost(@PathParam("userId") int userId,
-                                      @PathParam("taskId") int taskId) {
+    public Response addTaskToUserPost(
+            @PathParam("userId") int userId, @PathParam("taskId") int taskId) {
         return addTaskToUser(userId, taskId);
     }
 
     @PUT
     @Path("/user/{userId}/task/{taskId}")
-    public Response addTaskToUserPut(@PathParam("userId") int userId,
-                                     @PathParam("taskId") int taskId) {
+    public Response addTaskToUserPut(
+            @PathParam("userId") int userId, @PathParam("taskId") int taskId) {
         return addTaskToUser(userId, taskId);
     }
 
@@ -150,8 +151,8 @@ public class TaskController {
 
     @DELETE
     @Path("/user/{userId}/task/{taskId}")
-    public Response removeTaskFromUser(@PathParam("userId") int userId,
-                                       @PathParam("taskId") int taskId) {
+    public Response removeTaskFromUser(
+            @PathParam("userId") int userId, @PathParam("taskId") int taskId) {
         User user = new User(userId);
         if (!user.isLoaded()) {
             return Response.status(Response.Status.BAD_REQUEST)

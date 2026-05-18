@@ -1,7 +1,6 @@
 package com.g4.api.model;
 
 import com.g4.api.db.DB;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 

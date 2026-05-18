@@ -62,10 +62,6 @@ public class User extends ModelAbstract {
     }
 
     public Map<String, Object> toArray() {
-        return Map.of(
-                "user_id", getId(),
-                "name", getName(),
-                "email", getEmail()
-        );
+        return Map.of("user_id", getId(), "name", getName(), "email", getEmail());
     }
 }

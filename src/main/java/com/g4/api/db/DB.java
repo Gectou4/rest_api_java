@@ -2,7 +2,6 @@ package com.g4.api.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
@@ -16,17 +15,20 @@ public class DB {
     }
 
     public static synchronized Connection getInstance(String server) {
-        HikariDataSource ds = DATA_SOURCES.computeIfAbsent(server, key -> {
-            DBConfig config = DBConfig.getConfig(key);
-            HikariConfig hikari = new HikariConfig();
-            hikari.setJdbcUrl(config.url());
-            hikari.setUsername(config.user());
-            hikari.setPassword(config.pwd());
-            hikari.setMaximumPoolSize(10);
-            hikari.setMinimumIdle(2);
-            hikari.setConnectionTimeout(30000);
-            return new HikariDataSource(hikari);
-        });
+        HikariDataSource ds =
+                DATA_SOURCES.computeIfAbsent(
+                        server,
+                        key -> {
+                            DBConfig config = DBConfig.getConfig(key);
+                            HikariConfig hikari = new HikariConfig();
+                            hikari.setJdbcUrl(config.url());
+                            hikari.setUsername(config.user());
+                            hikari.setPassword(config.pwd());
+                            hikari.setMaximumPoolSize(10);
+                            hikari.setMinimumIdle(2);
+                            hikari.setConnectionTimeout(30000);
+                            return new HikariDataSource(hikari);
+                        });
         try {
             return ds.getConnection();
         } catch (SQLException e) {

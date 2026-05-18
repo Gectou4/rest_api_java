@@ -88,12 +88,17 @@ public class UserTask extends ModelAbstract {
         try {
             getConnection().setAutoCommit(false);
 
-            try (PreparedStatement stmt = getConnection().prepareStatement("DELETE FROM user_task WHERE user_id = ?")) {
+            try (PreparedStatement stmt =
+                    getConnection()
+                            .prepareStatement("DELETE FROM user_task WHERE user_id = ?")) {
                 stmt.setInt(1, getUserId());
                 stmt.executeUpdate();
             }
 
-            try (PreparedStatement stmt = getConnection().prepareStatement("INSERT INTO user_task (user_id, task_id) VALUES (?, ?)")) {
+            try (PreparedStatement stmt =
+                    getConnection()
+                            .prepareStatement(
+                                    "INSERT INTO user_task (user_id, task_id) VALUES (?, ?)")) {
                 for (int taskId : taskList.keySet()) {
                     stmt.setInt(1, getUserId());
                     stmt.setInt(2, taskId);
@@ -124,7 +129,10 @@ public class UserTask extends ModelAbstract {
         try {
             getConnection().setAutoCommit(false);
 
-            try (PreparedStatement stmt = getConnection().prepareStatement("DELETE FROM user_task WHERE user_id = ? AND task_id = ?")) {
+            try (PreparedStatement stmt =
+                    getConnection()
+                            .prepareStatement(
+                                    "DELETE FROM user_task WHERE user_id = ? AND task_id = ?")) {
                 stmt.setInt(1, getUserId());
                 stmt.setInt(2, taskId);
                 stmt.executeUpdate();
