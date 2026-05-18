@@ -1,0 +1,191 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint (Checkstyle)"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run checkstyle
+        run: mvn checkstyle:check
+
+  format:
+    runs-on: ubuntu-latest
+    name: "Format (Spotless)"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Check formatting
+        run: mvn spotless:check
+
+  test:
+    needs: [lint, format]
+    runs-on: ubuntu-latest
+    name: "Tests (JUnit 5)"
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rest_api
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root --password=root"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -h127.0.0.1 -uroot -proot --silent; do
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+
+      - name: Initialize database
+        run: |
+          mysql -h127.0.0.1 -uroot -proot rest_api < share/sql/rest_api.sql
+
+      - name: Build jar
+        run: mvn clean package -DskipTests
+
+      - name: Start API server
+        env:
+          DB_USER: root
+          DB_PWD: root
+          DB_URL: jdbc:mysql://127.0.0.1:3306/rest_api?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Paris
+          PORT: 8080
+        run: |
+          nohup java -jar target/rest-api-java-1.0.0.jar > api.log 2>&1 &
+          echo "Waiting for API to start..."
+          for i in {1..30}; do
+            if curl -sf http://localhost:8080/user/1 > /dev/null 2>&1; then
+              echo "API is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API failed to start"
+          cat api.log
+          exit 1
+
+      - name: Run tests
+        env:
+          API_BASE_URL: http://localhost:8080
+        run: mvn test
+
+  build:
+    needs: [lint, format, test]
+    runs-on: ubuntu-latest
+    name: "Build (fat jar)"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build fat jar
+        run: mvn clean package -DskipTests
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rest-api-java
+          path: target/rest-api-java-1.0.0.jar
+
+  quality-gate:
+    needs: [lint, format, test, build]
+    runs-on: ubuntu-latest
+    name: "Quality Gate"
+    if: always()
+    steps:
+      - name: Check all jobs status
+        run: |
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Format: ${{ needs.format.result }}"
+          echo "Test: ${{ needs.test.result }}"
+          echo "Build: ${{ needs.build.result }}"
+
+          if [[ "${{ needs.lint.result }}" == "failure" || "${{ needs.format.result }}" == "failure" || "${{ needs.test.result }}" == "failure" || "${{ needs.build.result }}" == "failure" ]]; then
+            echo "Quality gate FAILED"
+            exit 1
+          fi
+
+          echo "Quality gate PASSED"
+
+  auto-fix:
+    needs: [format]
+    if: failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    name: "Auto-fix formatting"
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Apply formatting fixes
+        run: mvn spotless:apply
+
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No formatting changes to commit"
+          else
+            git commit -m "style: auto-fix formatting with Spotless"
+            git push
+          fi
