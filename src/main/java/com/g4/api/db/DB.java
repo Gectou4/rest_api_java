@@ -10,10 +10,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DB {
 
     private static final Map<String, HikariDataSource> DATA_SOURCES = new ConcurrentHashMap<>();
+    private static final ThreadLocal<Connection> THREAD_CONNECTION = new ThreadLocal<>();
 
     private DB() {}
 
     public static synchronized Connection getInstance(String server) {
+        Connection conn = THREAD_CONNECTION.get();
+        if (conn != null) {
+            try {
+                if (!conn.isClosed()) {
+                    return conn;
+                }
+            } catch (SQLException e) {
+                THREAD_CONNECTION.remove();
+            }
+        }
+
         HikariDataSource ds =
                 DATA_SOURCES.computeIfAbsent(
                         server,
@@ -28,14 +40,30 @@ public class DB {
                             hikari.setConnectionTimeout(30000);
                             return new HikariDataSource(hikari);
                         });
+
         try {
-            return ds.getConnection();
+            conn = ds.getConnection();
+            THREAD_CONNECTION.set(conn);
+            return conn;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get DB connection: " + e.getMessage(), e);
         }
     }
 
+    public static void releaseConnection() {
+        Connection conn = THREAD_CONNECTION.get();
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                // ignore
+            }
+            THREAD_CONNECTION.remove();
+        }
+    }
+
     public static void closeAll() {
+        releaseConnection();
         for (HikariDataSource ds : DATA_SOURCES.values()) {
             if (!ds.isClosed()) {
                 ds.close();
