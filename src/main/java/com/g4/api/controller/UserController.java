@@ -14,9 +14,7 @@ public class UserController {
     public Response getUser(@PathParam("id") int id) {
         User user = new User(id);
         if (!user.isLoaded()) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("No user found")
-                    .build();
+            return Response.status(Response.Status.NOT_FOUND).entity("No user found").build();
         }
         return Response.ok(user.toArray()).build();
     }
@@ -26,9 +24,7 @@ public class UserController {
     public Response getUserTasks(@PathParam("id") int id) {
         User user = new User(id);
         if (!user.isLoaded()) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("No user found")
-                    .build();
+            return Response.status(Response.Status.NOT_FOUND).entity("No user found").build();
         }
         return Response.ok(user.getTasks()).build();
     }

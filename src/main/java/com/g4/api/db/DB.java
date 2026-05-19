@@ -11,8 +11,7 @@ public class DB {
 
     private static final Map<String, HikariDataSource> DATA_SOURCES = new ConcurrentHashMap<>();
 
-    private DB() {
-    }
+    private DB() {}
 
     public static synchronized Connection getInstance(String server) {
         HikariDataSource ds =

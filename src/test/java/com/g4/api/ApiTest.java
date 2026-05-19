@@ -1,12 +1,12 @@
 package com.g4.api;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import org.junit.jupiter.api.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ApiTest {
@@ -25,13 +25,9 @@ class ApiTest {
     @Order(1)
     void testGetUser() throws Exception {
         HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(URI.create(BASE_URL + "/user/1"))
-                        .GET()
-                        .build();
+                HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/user/1")).GET().build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
         String body = response.body();
@@ -43,13 +39,9 @@ class ApiTest {
     @Order(2)
     void testGetUserTask() throws Exception {
         HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(URI.create(BASE_URL + "/user/1/task"))
-                        .GET()
-                        .build();
+                HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/user/1/task")).GET().build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
         String body = response.body();
@@ -68,8 +60,7 @@ class ApiTest {
                         .POST(HttpRequest.BodyPublishers.ofString(body))
                         .build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(201, response.statusCode());
         String responseBody = response.body();
@@ -78,9 +69,7 @@ class ApiTest {
 
         createdTaskId =
                 Integer.parseInt(
-                        responseBody.split("task_id")[1]
-                                .replaceAll("[^0-9]", "")
-                                .substring(0, 1));
+                        responseBody.split("task_id")[1].replaceAll("[^0-9]", "").substring(0, 1));
     }
 
     @Test
@@ -94,8 +83,7 @@ class ApiTest {
                         .POST(HttpRequest.BodyPublishers.ofString(body))
                         .build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
     }
@@ -109,8 +97,7 @@ class ApiTest {
                         .POST(HttpRequest.BodyPublishers.noBody())
                         .build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
     }
@@ -124,8 +111,7 @@ class ApiTest {
                         .DELETE()
                         .build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
     }
@@ -134,13 +120,9 @@ class ApiTest {
     @Order(7)
     void testDelTask() throws Exception {
         HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(URI.create(BASE_URL + "/task/3"))
-                        .DELETE()
-                        .build();
+                HttpRequest.newBuilder().uri(URI.create(BASE_URL + "/task/3")).DELETE().build();
 
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
     }
