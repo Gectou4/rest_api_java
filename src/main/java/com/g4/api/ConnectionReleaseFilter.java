@@ -11,7 +11,8 @@ import java.io.IOException;
 public class ConnectionReleaseFilter implements ContainerResponseFilter {
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+    public void filter(
+            ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
         DB.releaseConnection();
     }
