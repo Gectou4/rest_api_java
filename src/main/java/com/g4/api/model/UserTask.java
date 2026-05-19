@@ -88,8 +88,7 @@ public class UserTask extends ModelAbstract {
             getConnection().setAutoCommit(false);
 
             try (PreparedStatement stmt =
-                    getConnection()
-                            .prepareStatement("DELETE FROM user_task WHERE user_id = ?")) {
+                    getConnection().prepareStatement("DELETE FROM user_task WHERE user_id = ?")) {
                 stmt.setInt(1, getUserId());
                 stmt.executeUpdate();
             }

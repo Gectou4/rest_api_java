@@ -83,9 +83,7 @@ public class Task extends ModelAbstract {
     }
 
     public LocalDateTime getCreationDate() {
-        return creationDate != null
-                ? creationDate
-                : LocalDateTime.now(ZoneId.of("Europe/Paris"));
+        return creationDate != null ? creationDate : LocalDateTime.now(ZoneId.of("Europe/Paris"));
     }
 
     public String getDescription() {

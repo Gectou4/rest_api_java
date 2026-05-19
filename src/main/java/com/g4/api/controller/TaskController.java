@@ -25,9 +25,7 @@ public class TaskController {
             @FormParam("description") String description,
             @FormParam("status") Integer status) {
         if (title == null || title.isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Title is required")
-                    .build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Title is required").build();
         }
 
         Task task = new Task();
@@ -36,9 +34,7 @@ public class TaskController {
         task.setStatus(status != null ? TaskStatus.fromValue(status) : TaskStatus.BACKLOG);
 
         if (task.save()) {
-            return Response.status(Response.Status.CREATED)
-                    .entity(task.toArray())
-                    .build();
+            return Response.status(Response.Status.CREATED).entity(task.toArray()).build();
         }
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -69,9 +65,7 @@ public class TaskController {
     private Response editTask(int id, String title, String description, Integer status) {
         Task task = new Task(id);
         if (!task.isLoaded()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Task not found")
-                    .build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Task not found").build();
         }
 
         task.setTitle(title != null ? title.trim() : task.getTitle());
