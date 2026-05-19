@@ -2,7 +2,6 @@ package com.g4.api;
 
 import com.g4.api.db.DB;
 import com.sun.net.httpserver.HttpServer;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.concurrent.Executors;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
