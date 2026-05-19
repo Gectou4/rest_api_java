@@ -12,8 +12,7 @@ public class UserTask extends ModelAbstract {
     private final Map<Integer, Task> taskList = new LinkedHashMap<>();
     protected String table = "user_task";
 
-    public UserTask() {
-    }
+    public UserTask() {}
 
     public UserTask(int id) {
         if (id > 0) {

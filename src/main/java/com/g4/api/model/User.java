@@ -11,8 +11,7 @@ public class User extends ModelAbstract {
     private String name = "";
     protected String table = "user";
 
-    public User() {
-    }
+    public User() {}
 
     public User(int id) {
         if (id > 0) {

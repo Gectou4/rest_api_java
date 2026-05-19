@@ -24,8 +24,7 @@ public class Task extends ModelAbstract {
     private TaskStatus status = TaskStatus.BACKLOG;
     protected String table = "task";
 
-    public Task() {
-    }
+    public Task() {}
 
     public Task(int id) {
         if (id > 0) {
