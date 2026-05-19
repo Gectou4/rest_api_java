@@ -1,7 +1,10 @@
 package com.g4.api;
 
 import com.g4.api.db.DB;
+import com.sun.net.httpserver.HttpServer;
+import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.concurrent.Executors;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -21,7 +24,8 @@ public class Main {
 
         DB.getInstance("master");
 
-        var server = JdkHttpServerFactory.createHttpServer(URI.create(baseUri), config);
+        HttpServer server = JdkHttpServerFactory.createHttpServer(URI.create(baseUri), config);
+        server.setExecutor(Executors.newFixedThreadPool(10));
 
         Runtime.getRuntime()
                 .addShutdownHook(
