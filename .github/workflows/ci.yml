@@ -132,7 +132,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: rest-api-java
           path: target/rest-api-java-1.0.0.jar
