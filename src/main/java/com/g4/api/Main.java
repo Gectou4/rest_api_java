@@ -2,7 +2,7 @@ package com.g4.api;
 
 import com.g4.api.db.DB;
 import java.net.URI;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 public class Main {
@@ -21,14 +21,14 @@ public class Main {
 
         DB.getInstance("master");
 
-        var server = JettyHttpContainerFactory.createServer(URI.create(baseUri), config);
+        var server = JdkHttpServerFactory.createHttpServer(URI.create(baseUri), config);
 
         Runtime.getRuntime()
                 .addShutdownHook(
                         new Thread(
                                 () -> {
                                     try {
-                                        server.stop();
+                                        server.stop(0);
                                         DB.closeAll();
                                     } catch (Exception e) {
                                         System.err.println(
@@ -37,7 +37,7 @@ public class Main {
                                 }));
 
         try {
-            server.join();
+            Thread.currentThread().join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.err.println("Server interrupted: " + e.getMessage());
