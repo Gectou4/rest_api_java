@@ -9,8 +9,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Task extends ModelAbstract {
+
+    private static final Logger log = LoggerFactory.getLogger(Task.class);
 
     public static final int STATUS_BACKLOG = TaskStatus.BACKLOG.getValue();
     public static final int STATUS_TODO = TaskStatus.TODO.getValue();
@@ -22,7 +26,6 @@ public class Task extends ModelAbstract {
     private String description = "";
     private LocalDateTime creationDate = null;
     private TaskStatus status = TaskStatus.BACKLOG;
-    protected String table = "task";
 
     public Task() {}
 
@@ -33,6 +36,11 @@ public class Task extends ModelAbstract {
     }
 
     @Override
+    protected String getTableName() {
+        return "task";
+    }
+
+    @Override
     public void load(int id) {
         if (loaded) {
             return;
@@ -40,7 +48,7 @@ public class Task extends ModelAbstract {
         setId(id);
         String sql =
                 "SELECT status, title, description, creation_date FROM "
-                        + table
+                        + getTableName()
                         + " WHERE task_id = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setInt(1, getId());
@@ -99,8 +107,8 @@ public class Task extends ModelAbstract {
             if (getId() <= 0) {
                 String sql =
                         "INSERT INTO "
-                                + table
-                                + " (status, title, description, creation_date) VALUES (?, ?, ?, ?)";
+                        + getTableName()
+                        + " (status, title, description, creation_date) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement stmt =
                         getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setInt(1, getStatus().getValue());
@@ -117,8 +125,8 @@ public class Task extends ModelAbstract {
             } else {
                 String sql =
                         "UPDATE "
-                                + table
-                                + " SET status=?, title=?, description=?, creation_date=? WHERE task_id = ?";
+                        + getTableName()
+                        + " SET status=?, title=?, description=?, creation_date=? WHERE task_id = ?";
                 try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
                     stmt.setInt(1, getStatus().getValue());
                     stmt.setString(2, getTitle());
@@ -130,25 +138,27 @@ public class Task extends ModelAbstract {
             }
             return true;
         } catch (SQLException e) {
+            log.error("Failed to save task {}: {}", getId(), e.getMessage(), e);
             return false;
         }
     }
 
     public boolean delete() {
         try {
-            String sql = "DELETE FROM " + table + " WHERE task_id = ?";
+            String sql = "DELETE FROM " + getTableName() + " WHERE task_id = ?";
             try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
                 stmt.setInt(1, getId());
                 return stmt.executeUpdate() > 0;
             }
         } catch (SQLException e) {
+            log.error("Failed to delete task {}: {}", getId(), e.getMessage(), e);
             return false;
         }
     }
 
     public Map<Integer, Map<String, Object>> getAll() {
         Map<Integer, Map<String, Object>> taskList = new LinkedHashMap<>();
-        String sql = "SELECT task_id, status, title, description, creation_date FROM " + table;
+        String sql = "SELECT task_id, status, title, description, creation_date FROM " + getTableName();
         try (PreparedStatement stmt = getConnection().prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -165,7 +175,7 @@ public class Task extends ModelAbstract {
                 taskList.put(taskId, task);
             }
         } catch (SQLException e) {
-            // nothing yet
+            log.error("Failed to load all tasks: {}", e.getMessage(), e);
         }
         return taskList;
     }

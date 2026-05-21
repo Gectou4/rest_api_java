@@ -9,7 +9,6 @@ public class User extends ModelAbstract {
 
     private String email = "";
     private String name = "";
-    protected String table = "user";
 
     public User() {}
 
@@ -20,12 +19,17 @@ public class User extends ModelAbstract {
     }
 
     @Override
+    protected String getTableName() {
+        return "user";
+    }
+
+    @Override
     public void load(int id) {
         if (loaded) {
             return;
         }
         setId(id);
-        String sql = "SELECT email, name FROM " + table + " WHERE user_id = ?";
+        String sql = "SELECT email, name FROM " + getTableName() + " WHERE user_id = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setInt(1, getId());
             try (ResultSet rs = stmt.executeQuery()) {

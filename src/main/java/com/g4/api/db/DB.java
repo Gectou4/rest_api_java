@@ -6,8 +6,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DB {
+
+    private static final Logger log = LoggerFactory.getLogger(DB.class);
 
     private static final Map<String, HikariDataSource> DATA_SOURCES = new ConcurrentHashMap<>();
     private static final ThreadLocal<Connection> THREAD_CONNECTION = new ThreadLocal<>();
@@ -22,6 +26,8 @@ public class DB {
                     return conn;
                 }
             } catch (SQLException e) {
+                log.warn("Cached connection is closed, removing: {}", e.getMessage(), e);
+                try { conn.close(); } catch (SQLException ignored) {}
                 THREAD_CONNECTION.remove();
             }
         }
@@ -56,7 +62,7 @@ public class DB {
             try {
                 conn.close();
             } catch (SQLException e) {
-                // ignore
+                log.warn("Failed to close connection: {}", e.getMessage(), e);
             }
             THREAD_CONNECTION.remove();
         }

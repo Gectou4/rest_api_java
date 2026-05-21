@@ -7,7 +7,6 @@ import java.sql.SQLException;
 public abstract class ModelAbstract {
 
     protected int id = 0;
-    protected String table = "";
     protected String dbServer = "master";
     protected boolean loaded = false;
 
@@ -28,4 +27,6 @@ public abstract class ModelAbstract {
     }
 
     public abstract void load(int id);
+
+    protected abstract String getTableName();
 }

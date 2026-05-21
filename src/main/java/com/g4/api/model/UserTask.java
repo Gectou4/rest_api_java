@@ -5,12 +5,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserTask extends ModelAbstract {
 
+    private static final Logger log = LoggerFactory.getLogger(UserTask.class);
+
     private int userId = 0;
     private final Map<Integer, Task> taskList = new LinkedHashMap<>();
-    protected String table = "user_task";
 
     public UserTask() {}
 
@@ -18,6 +21,11 @@ public class UserTask extends ModelAbstract {
         if (id > 0) {
             load(id);
         }
+    }
+
+    @Override
+    protected String getTableName() {
+        return "user_task";
     }
 
     @Override
@@ -108,17 +116,18 @@ public class UserTask extends ModelAbstract {
             getConnection().commit();
             return true;
         } catch (SQLException e) {
+            log.error("Failed to save user tasks for user {}: {}", getUserId(), e.getMessage(), e);
             try {
                 getConnection().rollback();
             } catch (SQLException rollbackEx) {
-                // ignore
+                log.warn("Rollback failed after save error: {}", rollbackEx.getMessage(), rollbackEx);
             }
             return false;
         } finally {
             try {
                 getConnection().setAutoCommit(true);
             } catch (SQLException e) {
-                // ignore
+                log.warn("Failed to reset auto-commit: {}", e.getMessage(), e);
             }
         }
     }
@@ -139,17 +148,18 @@ public class UserTask extends ModelAbstract {
             getConnection().commit();
             return true;
         } catch (SQLException e) {
+            log.error("Failed to delete user task {} for user {}: {}", taskId, getUserId(), e.getMessage(), e);
             try {
                 getConnection().rollback();
             } catch (SQLException rollbackEx) {
-                // ignore
+                log.warn("Rollback failed after delete error: {}", rollbackEx.getMessage(), rollbackEx);
             }
             return false;
         } finally {
             try {
                 getConnection().setAutoCommit(true);
             } catch (SQLException e) {
-                // ignore
+                log.warn("Failed to reset auto-commit: {}", e.getMessage(), e);
             }
         }
     }
