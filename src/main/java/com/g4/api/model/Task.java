@@ -107,8 +107,8 @@ public class Task extends ModelAbstract {
             if (getId() <= 0) {
                 String sql =
                         "INSERT INTO "
-                        + getTableName()
-                        + " (status, title, description, creation_date) VALUES (?, ?, ?, ?)";
+                                + getTableName()
+                                + " (status, title, description, creation_date) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement stmt =
                         getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setInt(1, getStatus().getValue());
@@ -125,8 +125,8 @@ public class Task extends ModelAbstract {
             } else {
                 String sql =
                         "UPDATE "
-                        + getTableName()
-                        + " SET status=?, title=?, description=?, creation_date=? WHERE task_id = ?";
+                                + getTableName()
+                                + " SET status=?, title=?, description=?, creation_date=? WHERE task_id = ?";
                 try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
                     stmt.setInt(1, getStatus().getValue());
                     stmt.setString(2, getTitle());
@@ -158,7 +158,8 @@ public class Task extends ModelAbstract {
 
     public Map<Integer, Map<String, Object>> getAll() {
         Map<Integer, Map<String, Object>> taskList = new LinkedHashMap<>();
-        String sql = "SELECT task_id, status, title, description, creation_date FROM " + getTableName();
+        String sql =
+                "SELECT task_id, status, title, description, creation_date FROM " + getTableName();
         try (PreparedStatement stmt = getConnection().prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {

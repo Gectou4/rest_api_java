@@ -120,7 +120,10 @@ public class UserTask extends ModelAbstract {
             try {
                 getConnection().rollback();
             } catch (SQLException rollbackEx) {
-                log.warn("Rollback failed after save error: {}", rollbackEx.getMessage(), rollbackEx);
+                log.warn(
+                        "Rollback failed after save error: {}",
+                        rollbackEx.getMessage(),
+                        rollbackEx);
             }
             return false;
         } finally {
@@ -148,11 +151,19 @@ public class UserTask extends ModelAbstract {
             getConnection().commit();
             return true;
         } catch (SQLException e) {
-            log.error("Failed to delete user task {} for user {}: {}", taskId, getUserId(), e.getMessage(), e);
+            log.error(
+                    "Failed to delete user task {} for user {}: {}",
+                    taskId,
+                    getUserId(),
+                    e.getMessage(),
+                    e);
             try {
                 getConnection().rollback();
             } catch (SQLException rollbackEx) {
-                log.warn("Rollback failed after delete error: {}", rollbackEx.getMessage(), rollbackEx);
+                log.warn(
+                        "Rollback failed after delete error: {}",
+                        rollbackEx.getMessage(),
+                        rollbackEx);
             }
             return false;
         } finally {

@@ -27,7 +27,10 @@ public class DB {
                 }
             } catch (SQLException e) {
                 log.warn("Cached connection is closed, removing: {}", e.getMessage(), e);
-                try { conn.close(); } catch (SQLException ignored) {}
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
                 THREAD_CONNECTION.remove();
             }
         }

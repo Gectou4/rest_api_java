@@ -30,8 +30,11 @@ public class Main {
 
         int port =
                 Integer.parseInt(
-                        System.getenv().getOrDefault("PORT",
-                                props.getProperty("server.port", String.valueOf(DEFAULT_PORT))));
+                        System.getenv()
+                                .getOrDefault(
+                                        "PORT",
+                                        props.getProperty(
+                                                "server.port", String.valueOf(DEFAULT_PORT))));
         String baseUri = "http://0.0.0.0:" + port + "/";
 
         ResourceConfig config = new ResourceConfig();
