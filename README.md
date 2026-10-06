@@ -2,6 +2,21 @@
 
 API REST légère en Java JEE, sans framework lourd, avec sortie JSON.
 
+[![CI](https://github.com/Gectou4/rest_api_java/actions/workflows/ci.yml/badge.svg)](https://github.com/Gectou4/rest_api_java/actions/workflows/ci.yml)
+
+> **Part of the G4Api series.** The same small API (users, tasks and their N:N link) built in several stacks, to compare ecosystems: language, tooling, tests, static analysis and CI. Learning project, built in May 2026 with the help of an AI coding assistant. The PHP version is the reference.
+>
+> | Stack                | Repository                                                              |
+> | -------------------- | ----------------------------------------------------------------------- |
+> | PHP 8 (no framework) | [rest_api_php](https://github.com/Gectou4/rest_api_php)                 |
+> | Go                   | [rest_api_go](https://github.com/Gectou4/rest_api_go)                   |
+> | Rust (axum, sqlx)    | [rest_api_rs](https://github.com/Gectou4/rest_api_rs)                   |
+> | Java 21 (Jersey)     | [rest_api_java](https://github.com/Gectou4/rest_api_java) (this repo)   |
+> | .NET 8 (Dapper)      | [rest_api_netcsharp](https://github.com/Gectou4/rest_api_netcsharp)     |
+> | Python (Flask)       | [rest_api_python](https://github.com/Gectou4/rest_api_python)           |
+> | Node.js (Express)    | [rest_api_nodejs](https://github.com/Gectou4/rest_api_nodejs)           |
+> | React front-end      | [rest_api_front_react](https://github.com/Gectou4/rest_api_front_react) |
+
 Elle présente un exemple où on gère deux types d'objets et leurs relations :
 
 | Objet  | Champs |
@@ -31,7 +46,7 @@ Les statuts de tâche (`status`) sont des entiers : `1` Backlog · `2` Todo · `
 
 - **Java 21** (LTS)
 - **Jersey 3.x** (JAX-RS) — routing REST
-- **Jetty embedded** — serveur léger
+- **Serveur HTTP du JDK** (`jdk.httpserver`, via Jersey) — serveur léger
 - **Jackson** — sérialisation JSON
 - **HikariCP** — connection pooling
 - **MySQL 8.0** — base de données
@@ -168,7 +183,7 @@ rest_api_java/
 ├── share/sql/rest_api.sql           # Schéma de la base de données
 └── src/
     ├── main/java/com/g4/api/
-    │   ├── Main.java                # Point d'entrée (Jetty embedded)
+    │   ├── Main.java                # Point d'entrée (serveur HTTP du JDK)
     │   ├── ApiApplication.java      # Configuration JAX-RS
     │   ├── db/
     │   │   ├── DB.java              # Multiton HikariCP
